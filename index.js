@@ -6,12 +6,11 @@ let captureBtn = document.querySelector(".capture-btn");
 let recordFlag = false;
 let recorder;
 let chunks = []; //video data will be avliable chunks format like it will come little portion
-
+let transparentColor = "transparent";
 let constraints = {
   video: true,
   audio: true,
 };
-console.log(constraints);
 
 //window.navigator
 window.navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
@@ -47,16 +46,30 @@ recoredBtncontainer.addEventListener("click", (e) => {
     recorder.stop();
     stopTimmer();
     recoredBtn.classList.remove("scale-record");
-
   }
 });
 
-console.log(recorder);
+captureBtncontainer.addEventListener("click", (e) => {
+  let canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  let tool = canvas.getContext("2d");
+  tool.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //filtering
+  tool.fillStyle = transparentColor;
+  tool.fillRect(0, 0, canvas.width, canvas.height);
+  let imageURL = canvas.toDataURL();
+  let a = document.createElement("a");
+  a.href = imageURL;
+  a.download = "image.jpg";
+  a.click();
+});
+
 let timerID;
 let counter = 0; // reprsent total sec
 let timer = document.querySelector(".timer");
 function startTimer() {
-    timer.style.display="block"
+  timer.style.display = "block";
   function displayTimer() {
     let totalSeconds = counter;
     let hours = Number.parseInt(totalSeconds / 3600);
@@ -77,9 +90,22 @@ function startTimer() {
 }
 
 function stopTimmer() {
-
   clearInterval(timerID);
   timer.innerText = "oo:oo:oo";
-  timer.style.display="none"
-
+  timer.style.display = "none";
 }
+//image capture logic:
+
+//filter logic:
+let filterLayer=document.querySelector(".filter-layer")
+let allfilter = document.querySelectorAll(".filter");
+allfilter.forEach((element) => {
+  element.addEventListener("click", (e) => {
+    //set
+    //get color
+    transparentColor =
+      getComputedStyle(element).getPropertyValue("background-color");
+      filterLayer .style.backgroundColor=transparentColor;
+
+  });
+});
